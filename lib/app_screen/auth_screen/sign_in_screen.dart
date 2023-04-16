@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
@@ -13,6 +14,7 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInScreenState extends State<SignInScreen> {
   bool visable = true;
+  UserCredential? userCredential;
   late TextEditingController email;
   late TextEditingController password;
 
@@ -165,9 +167,28 @@ class _SignInScreenState extends State<SignInScreen> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: width * 0.08),
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async{
                   if(email.text.length>9&&password.text.length>7){
-                    Navigator.pushNamed(context, "/main_screen");
+                    try {
+                      final credential =
+                          await FirebaseAuth.instance.signInWithEmailAndPassword(
+                        email: email.text,
+                        password: password.text,
+                      );
+                    } on FirebaseAuthException catch (e) {
+                      if (e.code == 'user-not-found') {
+                        print('No user found for that email.');
+                      } else if (e.code == 'wrong-password') {
+                        print('Wrong password provided for that user.');
+                      }
+                    }
+                    if(!userCredential!.user!.emailVerified){
+                      User? user = FirebaseAuth.instance.currentUser;
+                      await user!.sendEmailVerification();
+                      Navigator.pushNamed(context, "/main_screen");
+                    //
+                    }
+
                   }
                 },
                 style: ElevatedButton.styleFrom(

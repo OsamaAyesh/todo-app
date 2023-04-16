@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:todo/app_screen/auth_screen/forget_password_screens/forget_password_screen.dart';
@@ -9,7 +10,9 @@ import 'package:todo/app_screen/home_screen/main_screen.dart';
 import 'package:todo/app_screen/splash_screen/out_screen/out_screen.dart';
 import 'package:todo/app_screen/splash_screen/splash_screen.dart';
 
-void main() {
+void main()  async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 

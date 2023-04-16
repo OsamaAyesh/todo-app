@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
@@ -183,13 +184,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: width * 0.08),
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async{
+                  try {
+                    final credential = await FirebaseAuth.instance
+                        .createUserWithEmailAndPassword(
+                      email: email.text,
+                      password: password.text,
+                    );
+                  } on FirebaseAuthException catch (e) {
+                    if (e.code == 'weak-password') {
+                      print('The password provided is too weak.');
+                    } else if (e.code == 'email-already-in-use') {
+                      print('The account already exists for that email.');
+                    }
+                  } catch (e) {
+
+                    print(e);
+                  }
                   Navigator.push(
                       context,
                       PageTransition(
                           duration: const Duration(milliseconds: 500),
                           type: PageTransitionType.rightToLeft,
                           child:  const SignInScreen()));
+
                 },
                 style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0XFF7C37FA),
